@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valor Arrecadado</title>
+<style>
+  :root{
+    --green-dark:#0b3d24;
+    --green:#146c3a;
+    --green-light:#1e9e56;
+    --gold:#d4af37;
+    --bill-green:#2f7d4f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(160deg, var(--green-dark) 0%, var(--green) 55%, var(--green-light) 100%);
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* Cédulas espalhadas */
+  .bill{
+    position:absolute;
+    width:160px;
+    height:80px;
+    background: repeating-linear-gradient(45deg, #dff5e6, #dff5e6 4px, #c9edd6 4px, #c9edd6 8px);
+    border:3px solid var(--gold);
+    border-radius:8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    opacity:0.85;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    font-size:28px;
+    color: var(--bill-green);
+    z-index:0;
+    user-select:none;
+    pointer-events:none;
+  }
+
+  .bill::before, .bill::after{
+    content:"$";
+    position:absolute;
+    font-size:14px;
+    color: var(--gold);
+    opacity:0.7;
+  }
+  .bill::before{ top:6px; left:8px; }
+  .bill::after{ bottom:6px; right:8px; }
+
+  .bill.b1{ top:5%; left:6%; transform: rotate(-18deg); }
+  .bill.b2{ top:12%; right:8%; transform: rotate(12deg); width:130px; height:65px; font-size:22px;}
+  .bill.b3{ top:35%; left:3%; transform: rotate(25deg); width:110px; height:55px; font-size:20px;}
+  .bill.b4{ top:60%; left:10%; transform: rotate(-10deg); }
+  .bill.b5{ top:75%; right:5%; transform: rotate(-20deg); width:140px; height:70px;}
+  .bill.b6{ top:22%; left:42%; transform: rotate(8deg); width:100px; height:50px; font-size:18px; opacity:0.5;}
+  .bill.b7{ bottom:8%; left:35%; transform: rotate(15deg); }
+  .bill.b8{ top:48%; right:20%; transform: rotate(-8deg); width:120px; height:60px; font-size:20px; opacity:0.6;}
+  .bill.b9{ top:2%; left:45%; transform: rotate(-25deg); width:90px; height:45px; font-size:16px; opacity:0.45;}
+  .bill.b10{ bottom:15%; right:32%; transform: rotate(30deg); width:100px; height:50px; font-size:18px; opacity:0.5;}
+
+  .coin{
+    position:absolute;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #f7e08a, var(--gold) 70%);
+    border:2px solid #b9902a;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    z-index:0;
+    opacity:0.9;
+  }
+  .coin::after{
+    content:"$";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#7a5c14;
+    font-weight:bold;
+    font-size:18px;
+  }
+  .coin.c1{ top:18%; left:20%; }
+  .coin.c2{ top:8%; right:25%; width:34px; height:34px;}
+  .coin.c3{ bottom:20%; left:18%; }
+  .coin.c4{ bottom:30%; right:12%; width:36px; height:36px;}
+  .coin.c5{ top:55%; left:48%; width:30px; height:30px; opacity:0.6;}
+  .coin.c6{ bottom:6%; right:45%; }
+
+  .container{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+  }
+
+  .card{
+    background: rgba(255,255,255,0.96);
+    border-radius:20px;
+    padding:50px 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    border: 4px solid var(--gold);
+    max-width:480px;
+    width:100%;
+  }
+
+  h1{
+    margin:0 0 10px 0;
+    color: var(--green-dark);
+    font-size:2.2rem;
+    letter-spacing:0.5px;
+  }
+
+  .valor{
+    margin:0 0 30px 0;
+    color: var(--green);
+    font-size:3.6rem;
+    font-weight:800;
+    letter-spacing:1px;
+    text-shadow: 2px 2px 0 var(--gold);
+  }
+
+  .subtitle{
+    color:#4a4a4a;
+    margin-bottom:30px;
+    font-size:1rem;
+  }
+
+  .pix-box{
+    background: #f4f4f4;
+    border:2px dashed var(--green);
+    border-radius:12px;
+    padding:14px 18px;
+    font-size:1.1rem;
+    color: var(--green-dark);
+    font-weight:600;
+    margin-bottom:20px;
+    letter-spacing:1px;
+  }
+
+  .copy-btn{
+    background: linear-gradient(135deg, var(--gold), #b8860b);
+    color: var(--green-dark);
+    border:none;
+    padding:16px 32px;
+    font-size:1.1rem;
+    font-weight:bold;
+    border-radius:50px;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(212,175,55,0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .copy-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(212,175,55,0.6);
+  }
+
+  .copy-btn:active{
+    transform: translateY(0px) scale(0.97);
+  }
+
+  .copy-btn.copied{
+    background: linear-gradient(135deg, #2ecc71, #1e9e56);
+    color:#fff;
+  }
+
+  @media (max-width: 480px){
+    .bill{ display:none; }
+    h1{ font-size:1.7rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bill b1">$</div>
+  <div class="bill b2">$</div>
+  <div class="bill b3">$</div>
+  <div class="bill b4">$</div>
+  <div class="bill b5">$</div>
+  <div class="bill b6">$</div>
+  <div class="bill b7">$</div>
+  <div class="bill b8">$</div>
+  <div class="bill b9">$</div>
+  <div class="bill b10">$</div>
+
+  <div class="coin c1"></div>
+  <div class="coin c2"></div>
+  <div class="coin c3"></div>
+  <div class="coin c4"></div>
+  <div class="coin c5"></div>
+  <div class="coin c6"></div>
+
+  <div class="container">
+    <div class="card">
+      <h1>Arrecadação da Resenha</h1>
+      <div class="valor">R$30,00</div>
+      <p class="subtitle">Ajude contribuindo via PIX</p>
+
+      <div class="pix-box" id="pixKey">34996926829</div>
+
+      <button class="copy-btn" id="copyBtn" onclick="copyPix()">
+        📋 Copiar código PIX
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function copyPix(){
+      const pix = document.getElementById('pixKey').innerText;
+      const btn = document.getElementById('copyBtn');
+
+      navigator.clipboard.writeText(pix).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = '✅ Copiado!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '📋 Copiar código PIX';
+        }, 2000);
+      }).catch(() => {
+        // Fallback para navegadores sem suporte ao clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = pix;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        btn.classList.add('copied');
+        btn.innerHTML = '✅ Copiado!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = '📋 Copiar código PIX';
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
